@@ -13,7 +13,7 @@ jobs:
       CCACHE_MAXSIZE: "2G"
       CCACHE_HARDLINK: "true"
       KERNEL_DEFCONFIG: "vendor/whyred-perf_defconfig"
-      KERNEL_CMDLINE: "ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- O=out"
+      KERNEL_CMDLINE: "ARCH=arm64 CC=clang CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- LLVM=1 LLVM_IAS=1 O=out"
 
     steps:
       - name: Checkout
@@ -25,8 +25,6 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -y 
-          sudo apt install gcc-aarch64-linux-gnu -y
-          sudo apt install gcc-arm-linux-gnueabi -y
           sudo apt install binutils make python3 libssl-dev build-essential bc  bison flex unzip libssl-dev ca-certificates xz-utils mkbootimg cpio device-tree-compiler git git-lfs -y
           git clone --branch android-4.19-stable-ksu --recurse-submodules --depth 100 https://github.com/user-why-red/android_kernel_xiaomi_sdm660_419.git ksource
           cd ksource
@@ -41,7 +39,7 @@ jobs:
       - name: Build Kernel-With-KernelSU
         run: |
           cd ksource
-          export PATH=$(pwd)/zyc-clang/bin/:$PATH
+          export PATH=$(pwd)/../zyc-clang/bin/:$PATH
           make $KERNEL_CMDLINE $KERNEL_DEFCONFIG CC="ccache clang"
           make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all)
           cp -rf out/arch/arm64/boot/ ../Artifacts
