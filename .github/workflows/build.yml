@@ -24,7 +24,9 @@ jobs:
         
       - name: Install dependencies
         run: |
-          sudo apt-get update -y 
+          sudo apt-get update -y
+          sudo apt install gcc-aarch64-linux-gnu -y
+          sudo apt install gcc-arm-linux-gnueabi -y
           sudo apt install binutils make python3 libssl-dev build-essential bc  bison flex unzip libssl-dev ca-certificates xz-utils mkbootimg cpio device-tree-compiler git git-lfs -y
           git clone --branch android-4.19-stable-ksu --recurse-submodules --depth 100 https://github.com/user-why-red/android_kernel_xiaomi_sdm660_419.git ksource
           cd ksource
