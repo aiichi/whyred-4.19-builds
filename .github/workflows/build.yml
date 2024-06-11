@@ -34,7 +34,8 @@ jobs:
           cd ..
           wget $(curl -fsSL https://github.com/ZyCromerZ/Clang/raw/main/Clang-main-link.txt)
           mkdir zyc-clang
-          mkdir Artifacts
+          mkdir ArtifactsKernel
+          mkdir ArtifactsLKM
           tar -xzvf Clang-*.tar.gz -C zyc-clang
           rm Clang-*.tar.gz
           
@@ -43,13 +44,36 @@ jobs:
           cd ksource
           export PATH=$(pwd)/../zyc-clang/bin/:$PATH
           make $KERNEL_CMDLINE $KERNEL_DEFCONFIG CC="ccache clang"
+          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_FORCE_LOAD
+          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_FORCE_UNLOAD
+          $(pwd)/scripts/config --file $(pwd)/out/.config -d CONFIG_MODULE_SIG_FORCE
           make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all)
-          cp -rf out/arch/arm64/boot/ ../Artifacts
+          cp -rf out/arch/arm64/boot/ ../ArtifactsKernel
           cd ..
           
-      - name: Upload
+      - name: Download LKM
+        run: |
+          cd ksource
+          curl -LSs "https://raw.githubusercontent.com/aiichi/KernelMemHack/main/kernel/setup.sh" | bash -
+          cd ..
+      
+      - name: Build LKM
+        run: |
+          cd ksource
+          make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all) olddefconfig
+          make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all) modules
+          cp -rf driver/khack/ ../ArtifactsLKM
+          cd ..
+      
+      - name: Upload Artifacts-KERNEL
         uses: actions/upload-artifact@v4
         with:
           name: Whyred-4.19-KSU-Artifacts
-          path: "Artifacts/*"
+          path: "ArtifactsKernel/*"
+          
+      - name: Upload Artifacts-LKM
+        uses: actions/upload-artifact@v4
+        with:
+          name: LKM-Artifacts
+          path: "ArtifactsLKM/*"
           
