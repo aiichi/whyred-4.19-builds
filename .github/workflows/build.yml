@@ -42,8 +42,8 @@ jobs:
           
       - name: Build Kernel-With-KernelSU
         run: |
+          export PATH=$(pwd)/zyc-clang/bin/:$PATH
           cd ksource
-          export PATH=$(pwd)/../zyc-clang/bin/:$PATH
           make $KERNEL_CMDLINE $KERNEL_DEFCONFIG CC="ccache clang"
           $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULES
           $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_UNLOAD
