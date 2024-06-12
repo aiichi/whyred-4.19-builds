@@ -47,6 +47,7 @@ jobs:
           make $KERNEL_CMDLINE $KERNEL_DEFCONFIG CC="ccache clang"
           $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULES
           $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_UNLOAD
+          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODVERSIONS
           $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_FORCE_LOAD
           $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_FORCE_UNLOAD
           make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all)
@@ -65,6 +66,7 @@ jobs:
           make $KERNEL_CMDLINE olddefconfig
           $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULES
           $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_UNLOAD
+          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODVERSIONS
           $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_FORCE_LOAD
           $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_FORCE_UNLOAD
           make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all) modules
