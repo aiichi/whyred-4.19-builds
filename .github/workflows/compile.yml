@@ -39,9 +39,13 @@ jobs:
         run: |
           export PATH=$(pwd)/zyc-clang/bin/:$PATH
           cd ksource
-          # echo "CONFIG_MODULES=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
-          # echo "CONFIG_MODULE_UNLOAD=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
-          # echo "CONFIG_MODVERSIONS=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
+          sed -i '/^CONFIG_BACKLIGHT_LCD_SUPPORT=y$/d' arch/arm64/configs/$KERNEL_DEFCONFIG
+          echo "CONFIG_HW_RANDOM=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
+          echo "CONFIG_TCP_CONG_WESTWOOD=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
+          
+          echo "CONFIG_MODULES=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
+          echo "CONFIG_MODULE_UNLOAD=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
+          echo "CONFIG_MODVERSIONS=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
           
           make $KERNEL_CMDLINE $KERNEL_DEFCONFIG CC="ccache clang"
           make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all)
