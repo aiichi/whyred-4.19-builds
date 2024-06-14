@@ -27,7 +27,7 @@ jobs:
           sudo apt install gcc-arm-linux-gnueabi -y
           sudo apt install binutils make python3 libssl-dev build-essential bc bison flex unzip libssl-dev ca-certificates xz-utils mkbootimg cpio device-tree-compiler git git-lfs lld -y
           sudo apt-get install clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 liblldb-dev libllvm-ocaml-dev libomp-dev libomp5 lld lldb llvm-dev llvm-runtime llvm python3-clang -y
-          git clone --branch a13/dynamic --recurse-submodules --depth 100 https://github.com/Atom-X-Devs/scarlet_xiaomi_sdm660.git ksource
+          git clone --branch stable-release --recurse-submodules --depth 100 https://github.com/user-why-red/android_kernel_xiaomi_sdm660_419.git ksource
           wget $(curl -fsSL https://github.com/ZyCromerZ/Clang/raw/main/Clang-main-link.txt)
           mkdir zyc-clang
           mkdir ArtifactsKernel
