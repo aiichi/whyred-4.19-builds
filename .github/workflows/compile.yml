@@ -1,9 +1,9 @@
-name: Build 4.19 Whyred Kernel
+name: Build Kernel
 
 on: [workflow_dispatch]
 
 jobs:
-  build-419:
+  build:
     runs-on: ubuntu-latest
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
@@ -16,10 +16,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-          
+
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2
-        
+
       - name: Install dependencies
         run: |
           sudo apt-get update -y
