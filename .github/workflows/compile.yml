@@ -39,7 +39,8 @@ jobs:
         run: |
           export PATH=$(pwd)/zyc-clang/bin/:$PATH
           cd ksource
-          sed -i '/^CONFIG_BACKLIGHT_LCD_SUPPORT=y$/d' arch/arm64/configs/$KERNEL_DEFCONFIG
+          # sed -i '/^CONFIG_BACKLIGHT_LCD_SUPPORT=y$/d' arch/arm64/configs/$KERNEL_DEFCONFIG
+          echo "CONFIG_BACKLIGHT_CLASS_DEVICE=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
           echo "CONFIG_HW_RANDOM=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
           echo "CONFIG_TCP_CONG_WESTWOOD=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
           
