@@ -1,8 +1,6 @@
 name: Build 4.19 Whyred Kernel
 
-on:
-  push:
-    branches: [ master ]
+on: [workflow_dispatch]
 
 jobs:
   build-419:
@@ -29,10 +27,7 @@ jobs:
           sudo apt install gcc-arm-linux-gnueabi -y
           sudo apt install binutils make python3 libssl-dev build-essential bc bison flex unzip libssl-dev ca-certificates xz-utils mkbootimg cpio device-tree-compiler git git-lfs lld -y
           sudo apt-get install clang-format clang-tidy clang-tools clang clangd libc++-dev libc++1 libc++abi-dev libc++abi1 libclang-dev libclang1 liblldb-dev libllvm-ocaml-dev libomp-dev libomp5 lld lldb llvm-dev llvm-runtime llvm python3-clang -y
-          git clone --branch android-4.19-stable-ksu --recurse-submodules --depth 100 https://github.com/user-why-red/android_kernel_xiaomi_sdm660_419.git ksource
-          cd ksource
-          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.4
-          cd ..
+          git clone --branch a13/dynamic --recurse-submodules --depth 100 https://github.com/Atom-X-Devs/scarlet_xiaomi_sdm660.git ksource
           wget $(curl -fsSL https://github.com/ZyCromerZ/Clang/raw/main/Clang-main-link.txt)
           mkdir zyc-clang
           mkdir ArtifactsKernel
@@ -40,48 +35,22 @@ jobs:
           tar -xzvf Clang-*.tar.gz -C zyc-clang
           rm Clang-*.tar.gz
           
-      - name: Build Kernel-With-KernelSU
+      - name: Build Kernel
         run: |
           export PATH=$(pwd)/zyc-clang/bin/:$PATH
           cd ksource
+          echo "CONFIG_MODULES=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
+          echo "CONFIG_MODULE_UNLOAD=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
+          echo "CONFIG_MODVERSIONS=y" >> arch/arm64/configs/$KERNEL_DEFCONFIG
+          
           make $KERNEL_CMDLINE $KERNEL_DEFCONFIG CC="ccache clang"
-          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULES
-          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_UNLOAD
-          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODVERSIONS
-          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_FORCE_LOAD
-          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_FORCE_UNLOAD
           make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all)
           cp -rf out/arch/arm64/boot/ ../ArtifactsKernel
-          cd ..
-          
-      - name: Download LKM
-        run: |
-          cd ksource
-          curl -LSs "https://raw.githubusercontent.com/aiichi/KernelMemHack/main/kernel/setup.sh" | bash -
-          cd ..
-      
-      - name: Build LKM
-        run: |
-          cd ksource
-          make $KERNEL_CMDLINE olddefconfig
-          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULES
-          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_UNLOAD
-          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODVERSIONS
-          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_FORCE_LOAD
-          $(pwd)/scripts/config --file $(pwd)/out/.config -e CONFIG_MODULE_FORCE_UNLOAD
-          make $KERNEL_CMDLINE CC="ccache clang" -j$(nproc --all) modules
-          cp -rf drivers/khack/ ../ArtifactsLKM
           cd ..
       
       - name: Upload Artifacts-KERNEL
         uses: actions/upload-artifact@v4
         with:
-          name: Whyred-4.19-KSU-Artifacts
+          name: Whyred-4.19-Artifacts
           path: "ArtifactsKernel/*"
-          
-      - name: Upload Artifacts-LKM
-        uses: actions/upload-artifact@v4
-        with:
-          name: LKM-Artifacts
-          path: "ArtifactsLKM/*"
           
